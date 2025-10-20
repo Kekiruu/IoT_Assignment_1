@@ -14,9 +14,23 @@ what you believe you need to improve,
 what the teacher could have said or done to make learning easier,
 5.Not much, I was sick that day so I had to do it at home and it still worked. Had a bit of issues with the last part but it was simple to fix
 
-what you could have done to make the learning easier, and
-6.
+what you could have done to make the learning easier
+6.same thing then before this lab was really straight foward and enjoyable to do.
 
 other reflections that you find relevant to your personal development.
-7.
+7.Nothing for this lab
 
+/////////////////////////////////////////////////////////////////
+
+and for the line of codes we learned:
+
+import RPi.GPIO as GPIO   #this is to import the library to be able to use RPI
+
+GPIO.setup(pin, GPIO.OUT)  #For setting up pin to be Input or outputs
+
+GPIO.output(pin, int(bin_str[2-i]))  #Activating the pins
+
+GPIO.cleanup()  #cleaning up
+
+GPIO.setmode(GPIO.BCM) # use BCM Pin Numbering
+GPIO.setwarnings(False)
