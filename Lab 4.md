@@ -1,11 +1,11 @@
 
 what you have learned
 
-1.I learned how to use RPI pins and how the coding works for it
+1.I learned how to use RPI pins and how the coding works for it and how class and objects work by using the count and index variable.
 
 what you found difficult to understand,
 
-2.Nothing at all, the logic was the same then arduino and we did somethign similar before already so it wasnt that complicated I just had to get used to python language
+2.Not much except for the class the objects but even those where quick to understand, the logic was the same then arduino and we did somethign similar before already so it wasnt that complicated I just had to get used to python language
 
 what you found easy to understand and what you think may have made this easy for you,
 
