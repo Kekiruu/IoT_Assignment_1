@@ -1,23 +1,29 @@
 what you have learned,
+
 1.I learn how to install the mqtt library and how to use it.
 
 what you found difficult to understand,
+
 2.Not much everything was straight foward the only issue I really had was that I forgot to put my file in a VENV so I couldn't download paho-mqqt
 
 what you found easy to understand and what you think may have made this easy for you,
+
 3.almost everything,like the usual basically everything we need is written in github all I had to do was follow it. 
 
-
 what you believe you need to improve,
+
 4.Getting used to using VENV
 
 what the teacher could have said or done to make learning easier,
+
 5.not much, any issues I had were answered and the instruction are good
 
 what you could have done to make the learning easier, and
+
 6.same thing then lab 4-5, not jumping instruction and actually read them.
 
 other reflections that you find relevant to your personal development.
+
 7.None for this lab
 
 ////////////////////////////////////////
