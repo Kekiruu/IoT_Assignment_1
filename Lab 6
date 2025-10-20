@@ -5,7 +5,7 @@ what you found difficult to understand,
 2.Not much everything was straight foward the only issue I really had was that I forgot to put my file in a VENV so I couldn't download paho-mqqt
 
 what you found easy to understand and what you think may have made this easy for you,
-3.like the usual basically everything we need is written in github all I had to do was follow it. The only thing I could think of to make is easier is to use a I2C devices that we all have cause me and my teamate had to go arround to find a device that would work for it.
+3.almost everything,like the usual basically everything we need is written in github all I had to do was follow it. 
 
 
 what you believe you need to improve,
