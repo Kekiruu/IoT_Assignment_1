@@ -21,6 +21,7 @@ For the manual mode it will just follow in input given on the web server. The mo
 
 Elegoo Robot car
 Sensors:
+
 -Ultrasonic
 
 -Maybe infrared (IR) sensor for line following
