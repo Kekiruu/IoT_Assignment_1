@@ -30,3 +30,6 @@ Actuator:
 -4 Motors
 -1 Servo
 
+## Comments:
+- I see you already had obstacle avoidance in mind. The idea probably came from you!
+- Add MQTT message topics and content specifics.
