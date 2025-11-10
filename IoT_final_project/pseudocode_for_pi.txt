@@ -1,10 +1,46 @@
+#let the esp32 deal with time delays
+
+declare variable for most recent left distance
+declare variable for most recent right distance
+
+declare variable for robot mode
+
 pi initializes mqtt broker
 pi subscribes to all topics on mqtt
 
-upon message received:
+
+define obstacle avoidance function:
   if the topic is ultrasonic distance then:
+        
+      if the value is greater than 20cm:
+          publish a message to the movement topic of "forward"
+      otherwise:
+        publish a message to the movement topic of "stop"
+        publish a message to the scanLeft topic of 1
+  
+    if the topic is leftDistance then:
+      store value in most recent left disance
+      publish a message to the scanRight topic of 1
+  
+    if the topic is rightDistance then:
+      store value in most recent right distance
+      if both distances are less than 20 then:
+        publish message to movement topic of "uturn"
+      otherwise, if right distance greater than left distance then:
+        publish a message to movement topic of "right"
+      otherwise:
+        publish a message to movement topic of "left"
+
+
+
+upon message received:
+  
+if robot mode is obstacle avoidance then:
+    call obstacle avoidance function
     
-  if the value is greater than 20cm:
-      publish a message to the movement topic of "forward"
+
+
+    
+
 
     
