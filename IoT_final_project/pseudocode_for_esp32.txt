@@ -1,1 +1,26 @@
-bbb
+associate 8 GPIO pins with motors, 2 pins each
+
+
+on message:
+  Read topic and value:
+  if topic is movement: 
+    call Movement fucntion and give value
+  otherwise:
+    if topic is scan left and value is equal to 1:
+      look left and record the value:
+      publish value to topic leftdistance
+    if topic is scan right and value is equal to 1:
+      look right and record the value:
+      publish value to topic right distance
+  
+    
+  
+
+
+
+Movemnt fucntion
+  if the value is left ,right, foward ,backward or stop
+    it would do the approtiate motor movment to move those direction
+
+  
+  
