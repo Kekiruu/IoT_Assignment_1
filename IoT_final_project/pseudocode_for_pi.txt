@@ -1,0 +1,10 @@
+pi initializes mqtt broker
+pi subscribes to all topics on mqtt
+
+upon message received:
+  if the topic is ultrasonic distance then:
+    
+  if the value is greater than 20cm:
+      publish a message to the movement topic of "forward"
+
+    
