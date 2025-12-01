@@ -32,7 +32,7 @@ byte distance = 0; // in cm.
 
 
 // functions
-int see() { // send out a pulse of ultrasound, wait for the pulse to echo back, and return its distance measurement.
+int see() { // send out a pulse of ultrasound, wait for the pulse to echo back, and return its distance measurement. This function is technically blocking, but the duration is so small that it doesn't affect any of the timestamping stuff.
   unsigned long duration; // in microseconds
   int dist; // in cm
   
@@ -83,7 +83,7 @@ void setup() {
 
   digitalWrite(stby, 1);
 
-  servo.write(80); // servo is a bit off from center. Higher angles are left, lower angles are right.
+  servo.write(80); // 90 degrees is normally center, but servo is a bit off. Higher angles are left, lower angles are right.
   //servo.attach(10);
 
 }
@@ -133,7 +133,7 @@ void loop() {
     }
     
   }
-  else if (currentT - commandT > 100) {move(0, 0);} // stop the robot if the serial connection to the ESP is interrupted
+  else if (currentT - commandT > 100) {move(0, 0);} // during normal movement operation the Pi will constantly send movement instructions, so if none are received for too long then it means either the Serial connection was interrupted (emergy stop the robot), or the Pi wants the robot to be stopped
   
   
 }
