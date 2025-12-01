@@ -133,7 +133,7 @@ void loop() {
     }
     
   }
-  else if (currentT - commandT > 100) {move(0, 0);} // during normal movement operation the Pi will constantly send movement instructions, so if none are received for too long then it means either the Serial connection was interrupted (emergy stop the robot), or the Pi wants the robot to be stopped
+  else if (currentT - commandT > 100) {move(0, 0);} // during normal movement operation the ESP will constantly send movement instructions, so if none are received for too long then it means the Serial connection was interrupted (emergency stop the robot) or the arduino was already commanded to stop.
   
   
 }
