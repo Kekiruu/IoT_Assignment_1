@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<nav>
+    <ul>
+        <li><a href="{{ url_for('plot_data') }}">Dashboard</a></li>
+        <li><a href="/manual">Controller</a></li>
+        {% if looking_at_dashboard %}
+            <li><a href="/topic/<topic_name>">Plot Single</a></li>
+            <li><a href="{{ url_for('list_rules') }}">Rules menu</a></li>
+        {% endif %}
+        
+        {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('logout') }}">Click to Logout</a></li>
+        {% endif %}
+    </ul>
+</nav>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MQTT Historian</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .plot-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MQTT Historian Data Visualization</h1>
+        <div class="plot-container">
+            {% if graph %}
+                {{ graph|safe }}
+            {% else %}
+                <p>No data available to display.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+
+</html>

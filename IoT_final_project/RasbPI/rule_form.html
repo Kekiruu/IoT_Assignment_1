@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Edit' if edit_mode else 'Create' }} Rule{% endblock %}
+
+{% block content %}
+    <h1>{{ 'Edit' if edit_mode else 'Create New' }} Automation Rule</h1>
+    
+    <form method="POST" id="ruleForm">
+        <h2>Conditions (ALL must be true)</h2>
+        <p class="help-text">
+            The action will only execute when <strong>ALL</strong> conditions below are satisfied at the same time.
+        </p>
+        
+        <div id="conditions-container">
+            {% if rule and rule.conditions %}
+                {% for condition in rule.conditions %}
+                <div class="condition-group">
+                    <div class="condition-header">Condition {{ loop.index }}</div>
+                    
+                    <div class="form-group">
+                        <label>MQTT Topic:</label>
+                        <input type="text" name="condition_topic[]" value="{{ condition.topic }}" 
+                               placeholder="e.g., house/temperature" required>
+                        <small>The topic to monitor (e.g., house/temperature)</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Comparison Operator:</label>
+                        <select name="condition_comparison[]" required>
+                            <option value=">" {% if condition.comparison == '>' %}selected{% endif %}>&gt; (greater than)</option>
+                            <option value=">=" {% if condition.comparison == '>=' %}selected{% endif %}>&gt;= (greater or equal)</option>
+                            <option value="<" {% if condition.comparison == '<' %}selected{% endif %}>&lt; (less than)</option>
+                            <option value="<=" {% if condition.comparison == '<=' %}selected{% endif %}>&lt;= (less or equal)</option>
+                            <option value="==" {% if condition.comparison == '==' %}selected{% endif %}>== (equal to)</option>
+                            <option value="!=" {% if condition.comparison == '!=' %}selected{% endif %}>!= (not equal to)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Value:</label>
+                        <input type="text" name="condition_value[]" value="{{ condition.value }}" 
+                               placeholder="e.g., 30" required>
+                        <small>The value to compare against (number or text)</small>
+                    </div>
+                    
+                    {% if loop.index > 1 %}
+                    <button type="button" class="btn btn-danger btn-sm remove-btn" 
+                            onclick="removeCondition(this)">Remove Condition</button>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Default first condition for new rules -->
+                <div class="condition-group">
+                    <div class="condition-header">Condition 1</div>
+                    
+                    <div class="form-group">
+                        <label>MQTT Topic:</label>
+                        <input type="text" name="condition_topic[]" placeholder="e.g., house/temperature" required>
+                        <small>The topic to monitor</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Comparison Operator:</label>
+                        <select name="condition_comparison[]" required>
+                            <option value=">">&gt; (greater than)</option>
+                            <option value=">=">&gt;= (greater or equal)</option>
+                            <option value="<">&lt; (less than)</option>
+                            <option value="<=">&lt;= (less or equal)</option>
+                            <option value="==" selected>== (equal to)</option>
+                            <option value="!=">!= (not equal to)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Value:</label>
+                        <input type="text" name="condition_value[]" placeholder="e.g., 30" required>
+                        <small>The value to compare against</small>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <button type="button" class="btn btn-secondary mb-20" onclick="addCondition()">
+            + Add Another Condition (AND)
+        </button>
+        
+        <h2>Action (What to do when conditions are met)</h2>
+        
+        <div class="form-group">
+            <label>Action Message:</label>
+            <input type="text" name="action_message" 
+                   value="{{ rule.action.message if rule else '' }}"
+                   placeholder="e.g., Temperature too high, turn on AC" required>
+            <small>Human-readable description of what this rule does</small>
+        </div>
+        
+        <div class="form-group">
+            <label>Publish to Topic:</label>
+            <input type="text" name="action_topic" 
+                   value="{{ rule.action.topic if rule else '' }}"
+                   placeholder="e.g., room/AC" required>
+            <small>MQTT topic where the command will be published</small>
+        </div>
+        
+        <div class="form-group">
+            <label>Publish Value:</label>
+            <input type="text" name="action_value" 
+                   value="{{ rule.action.value if rule else '' }}"
+                   placeholder="e.g., on" required>
+            <small>The value to publish (e.g., "on", "off", or a number)</small>
+        </div>
+        
+        <div class="text-center mb-20">
+            <a href="{{ url_for('create_rule') }}" class="btn btn-success">+ Create New Rule</a>
+            <form method="POST" action="{{ url_for('reload_controller') }}" style="display: inline; margin-left: 10px;">
+                <button type="submit" class="btn btn-primary">↻ Reload IoT Controller</button>
+            </form>
+        </div>
+    </form>
+    
+    <script>
+        function addCondition() {
+            const container = document.getElementById('conditions-container');
+            const count = container.children.length + 1;
+            
+            const conditionDiv = document.createElement('div');
+            conditionDiv.className = 'condition-group';
+            conditionDiv.innerHTML = `
+                <div class="condition-header">Condition ${count}</div>
+                
+                <div class="form-group">
+                    <label>MQTT Topic:</label>
+                    <input type="text" name="condition_topic[]" placeholder="e.g., house/temperature" required>
+                    <small>The topic to monitor</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Comparison Operator:</label>
+                    <select name="condition_comparison[]" required>
+                        <option value=">">&gt; (greater than)</option>
+                        <option value=">=">&gt;= (greater or equal)</option>
+                        <option value="<">&lt; (less than)</option>
+                        <option value="<=">&gt;= (less or equal)</option>
+                        <option value="==" selected>== (equal to)</option>
+                        <option value="!=">!= (not equal to)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Value:</label>
+                    <input type="text" name="condition_value[]" placeholder="e.g., 30" required>
+                    <small>The value to compare against</small>
+                </div>
+                
+                <button type="button" class="btn btn-danger btn-sm remove-btn" 
+                        onclick="removeCondition(this)">Remove Condition</button>
+            `;
+            
+            container.appendChild(conditionDiv);
+        }
+        
+        function removeCondition(button) {
+            button.parentElement.remove();
+            updateConditionNumbers();
+        }
+        
+        function updateConditionNumbers() {
+            const conditions = document.querySelectorAll('.condition-group');
+            conditions.forEach((condition, index) => {
+                condition.querySelector('.condition-header').textContent = `Condition ${index + 1}`;
+            });
+        }
+    </script>
+{% endblock %}

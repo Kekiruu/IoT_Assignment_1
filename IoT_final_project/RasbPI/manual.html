@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MQTT Button Publisher</title>
+</head>
+<body>
+    <h1>Click the button to publish an MQTT message</h1>
+    
+    <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('forward')">forward</button>
+    <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('backward')">backward</button>
+    <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('left')">left</button>
+    <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('right')">right</button>
+    <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('stop')">stop</button>
+    
+    <p id="status"></p>
+    
+    
+    <script>
+        const status = document.getElementById('status');
+
+        function sendMsg(msg) {
+            fetch('/publish/' + msg, { method: 'POST' })
+                .then(r => {
+                    if (r.ok) {
+                        status.textContent = 'Message sent: ' + msg;
+                    } else {
+                        status.textContent = 'Error from server';
+                    }
+                })
+                .catch(() => {
+                    status.textContent = 'Request failed';
+                });
+        }
+    </script>
+</body>
+</html>

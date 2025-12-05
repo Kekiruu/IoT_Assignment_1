@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}System Status{% endblock %}
+
+{% block content %}
+    <h1>System Health Dashboard</h1>
+    
+    <div class="status-grid">
+        <div class="status-card {% if status.historian.status == 'healthy' %}status-healthy{% elif status.historian.status == 'warning' %}status-warning{% else %}status-error{% endif %}">
+            <h3>📊 Historian Service</h3>
+            {% if status.historian.status == 'healthy' %}
+                <p class="status-text">✓ Running (heartbeat {{ status.historian.age }}s ago)</p>
+            {% elif status.historian.status == 'warning' %}
+                <p class="status-text">⚠ Slow (heartbeat {{ status.historian.age }}s ago)</p>
+            {% elif status.historian.status == 'missing' %}
+                <p class="status-text">✗ Not Running (no heartbeat file)</p>
+            {% else %}
+                <p class="status-text">✗ Dead (heartbeat {{ status.historian.age }}s ago)</p>
+            {% endif %}
+        </div>
+        
+        <div class="status-card {% if status.controller.status == 'healthy' %}status-healthy{% elif status.controller.status == 'warning' %}status-warning{% else %}status-error{% endif %}">
+            <h3>🤖 Controller Service</h3>
+            {% if status.controller.status == 'healthy' %}
+                <p class="status-text">✓ Running (heartbeat {{ status.controller.age }}s ago)</p>
+            {% elif status.controller.status == 'warning' %}
+                <p class="status-text">⚠ Slow (heartbeat {{ status.controller.age }}s ago)</p>
+            {% elif status.controller.status == 'missing' %}
+                <p class="status-text">✗ Not Running (no heartbeat file)</p>
+            {% else %}
+                <p class="status-text">✗ Dead (heartbeat {{ status.controller.age }}s ago)</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="text-center mt-20">
+        <button onclick="location.reload()" class="btn btn-primary">↻ Refresh Status</button>
+        <a href="{{ url_for('plot_data') }}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+{% endblock %}

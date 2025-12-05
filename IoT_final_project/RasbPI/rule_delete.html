@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Rule{% endblock %}
+
+{% block content %}
+    <h1>Confirm Rule Deletion</h1>
+    
+    <div class="alert alert-warning">
+        <strong>Warning:</strong> You are about to delete this rule. This action cannot be undone.
+    </div>
+    
+    <div class="rule-card">
+        <h2>Rule to be Deleted</h2>
+        
+        <div class="rule-logic">
+            <div class="logic-label">IF all of these conditions are true:</div>
+            
+            {% for condition in rule.conditions %}
+            <div class="condition">
+                <span class="condition-topic">{{ condition.topic }}</span>
+                <span class="operator">{{ condition.comparison }}</span>
+                <span class="condition-value">{{ condition.value }}</span>
+                {% if not loop.last %}
+                    <strong class="and-label">AND</strong>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            <div class="action">
+                <div class="logic-label">THEN Execute Action:</div>
+                <div><strong>Message:</strong> {{ rule.action.message }}</div>
+                <div><strong>Publish to:</strong> <code>{{ rule.action.topic }}</code> = <code>{{ rule.action.value }}</code></div>
+            </div>
+        </div>
+    </div>
+    
+    <form method="POST" class="text-center mt-20">
+        <button type="submit" class="btn btn-danger">Yes, Delete This Rule</button>
+        <a href="{{ url_for('list_rules') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,142 @@
+/* Rules Management Styles */
+
+.rule-card {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.rule-logic {
+    background-color: white;
+    padding: 15px;
+    border-left: 4px solid #3498db;
+    margin: 15px 0;
+}
+
+.logic-label {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.condition {
+    background-color: #e8f4f8;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.condition-topic {
+    font-weight: bold;
+    color: #2c3e50;
+    font-family: monospace;
+}
+
+.operator {
+    background-color: #3498db;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.condition-value {
+    font-family: monospace;
+    background-color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.and-label {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.action {
+    background-color: #d5f4e6;
+    padding: 15px;
+    margin-top: 15px;
+    border-left: 4px solid #27ae60;
+    border-radius: 4px;
+}
+
+/* Form Styles */
+
+.condition-group {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    background-color: #d7f0e8;
+    position: relative;
+}
+
+.condition-header {
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.form-group small {
+    display: block;
+    color: #7f8c8d;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.form-group input[type="text"],
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.remove-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.help-text {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #7f8c8d;
+}
+
+code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: monospace;
+    color: #e74c3c;
+}
