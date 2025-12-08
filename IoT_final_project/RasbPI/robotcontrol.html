@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Robot Control Center</title>
+</head>
+<body style="background-color: lightgrey;">
+
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('plot_data') }}">Dashboard</a></li>
+            {% if current_user.is_authenticated %}
+                <li style="margin-left: auto;"><a href="{{ url_for('logout') }}">Logout ({{ current_user.id }})</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    <center>
+        <h1>Robot Control</h1>
+        <h3>Run obstacle avoidance or move robot manually</h3>
+        
+        <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('forward')" style="background-color: lightgreen;">FORWARD</button>
+        <br>
+        <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('left')" style="background-color: lightgreen;">LEFT</button>
+        <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('right')" style="background-color: lightgreen;">RIGHT</button>
+        <br>
+        <button onmouseup="sendMsg('stop')" onmousedown="sendMsg('backward')" style="background-color: lightgreen;">BACKWARD</button>
+        <br><br>
+        <!-- the stop button is dual purpose: to get out of automatic mode, and as an e-stop if the robot doesnt stop when a movement button is released -->
+        <button onmousedown="sendMsg('stop')" style="background-color: pink;">STOP</button>
+        <br><br>
+        <button onmousedown="sendMsg('begin obstacle avoidance')" style="background-color: lightblue;">OBSTACLE AVOIDANCE</button>
+        
+        <p id="status"></p>
+    </center>
+    
+    <script>
+        const status = document.getElementById('status');
+
+        function sendMsg(msg) {
+            fetch('/publish/' + msg, { method: 'POST' })
+                .then(r => {
+                    if (r.ok) {
+                        status.textContent = 'Message sent: ' + msg;
+                    } else {
+                        status.textContent = 'Error from server';
+                    }
+                })
+                .catch(() => {
+                    status.textContent = 'Request failed';
+                });
+        }
+    </script>
+</body>
+</html>
