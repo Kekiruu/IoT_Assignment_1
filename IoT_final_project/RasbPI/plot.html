@@ -4,10 +4,10 @@
 <nav>
     <ul>
         <li><a href="{{ url_for('plot_data') }}">Dashboard</a></li>
-        <li><a href="/manual">Controller</a></li>
+        <li><a href="/robotcontrol">Controller</a></li>
         {% if looking_at_dashboard %}
             <li><a href="/topic/<topic_name>">Plot Single</a></li>
-            <li><a href="{{ url_for('list_rules') }}">Rules menu</a></li>
+            <!-- <li><a href="{{ url_for('list_rules') }}">Rules menu</a></li> -->
         {% endif %}
         
         {% if current_user.is_authenticated %}

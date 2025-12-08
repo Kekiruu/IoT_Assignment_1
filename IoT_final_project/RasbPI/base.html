@@ -12,7 +12,7 @@
             <li><a href="{{ url_for('plot_data') }}">Dashboard</a></li>
             <li><a href="{{ url_for('list_rules') }}">Manage Existing Rules</a></li>
             <li><a href="{{ url_for('system_status') }}">System Status</a></li>
-            <a href="{{ url_for('create_rule') }}">Create New Rule</a>
+            <li><a href="{{ url_for('create_rule') }}">Create New Rule</a></li>
             {% if current_user.is_authenticated %}
                 <li style="margin-left: auto;"><a href="{{ url_for('logout') }}">Logout ({{ current_user.id }})</a></li>
             {% endif %}
