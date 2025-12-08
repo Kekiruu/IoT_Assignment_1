@@ -10,23 +10,23 @@ import threading
 from datetime import datetime
 
 # Configuration
-RULES_FILE = "rules.json"
+RULES_FILE = "/opt/iot_system/rules.json"
 MQTT_BROKER = "localhost"
 MQTT_PORT = 1883
 
 #Global Variable
-inAutoMode = 1 # only publish messages for obstacle avoidance if we are in auto mode (1) and not manual mode (0)
+inAutoMode = 0 # only publish messages for obstacle avoidance if we are in auto mode (1) and not manual mode (0)
 moveInstruction = "move forward"
 ultraInstruction = "read forward"
-distance_left = -1
-distance_right = -1
-distance_forward = 255
+distanceLeft = -1
+distanceRight = -1
+distanceForward = 255
 
 
 # Monitoring files
-PID_FILE = "/tmp/iot_controller.pid"
-HEARTBEAT_FILE = "/tmp/iot_controller.heartbeat"
-HISTORIAN_HEARTBEAT = "/tmp/historian.heartbeat"
+PID_FILE = "/var/lib/iot_system/controller.pid"
+HEARTBEAT_FILE = "/var/lib/iot_system/controller.heartbeat"
+HISTORIAN_HEARTBEAT = "/var/lib/iot_system/historian.heartbeat"
 
 logging.basicConfig(
     filename='iot_controller.log',
@@ -70,9 +70,9 @@ class IoT_Controller:
         global inAutoMode
         global moveInstruction
         global ultraInstruction
-        global distance_left
-        global distance_right
-        global distance_forward
+        global distanceLeft
+        global distanceRight
+        global distanceForward
         print("on_message happened")
         
         try: # this statement just executes an alternate block if there is some kind of error in the primary block, like trying to convert a string into a float
@@ -102,56 +102,69 @@ class IoT_Controller:
         logging.info(f"Received: {topic} = {value}") #the first instance of logging info for what the user published
         print(topic, value)
         
+        #initialize obstacle avoidance mode values
+        if topic == "robot/instruction-request" and value == "begin obstacle avoidance" and not inAutoMode:
+            inAutoMode = 1
+            distanceAhead = 255
+            distanceLeft = -1
+            distanceRight = -1
+            moveInstruction = "move forward"
+            ultraInstruction = "read forward"
+        #
+        elif topic == "robot/manual-movement" and value == "stop":
+            inAutoMode = 0
+        
         #respond to the ESP asking for instructions or sending sensor data by publishing the relevant instructions
         if topic == "robot/telemetry/distance-ahead" and moveInstruction == "move forward":
-            if value >= 25:
+            distanceForward = value
+            if value >= 45:
                 moveInstruction = "move forward"
                 ultraInstuction = "read forward"
-                distance_left = -1
-                distance_right = -1
+                distanceLeft = -1
+                distanceRight = -1
                 
             else:
                 moveInstruction = "stop"
                 ultraInstruction = "read left"
-                distance_forward = value
-                print("left")
-                print(distance_left)
-                print(distance_right)
-        elif topic == "robot/telemetry/distance-ahead" and ultraInstruction == "read left" and distance_left == -1 :
-            distance_left = value
-            print(distance_left)
+                print("left distance:")
+                
+        elif topic == "robot/telemetry/distance-ahead" and ultraInstruction == "read left" and distanceLeft == -1 :
+            distanceLeft = value
+            print(distanceLeft)
             ultraInstruction = "read right"
-        elif topic == "robot/telemetry/distance-ahead" and ultraInstruction == "read right" and distance_right == -1 :
-            distance_right = value
+            print("right distance:")
+        elif topic == "robot/telemetry/distance-ahead" and ultraInstruction == "read right" and distanceRight == -1 :
+            distanceRight = value
             ultraInstruction = "compare"
-            print(distance_right)
+            print(distanceRight)
             
-            
-        elif topic == "robot/telemetry/distance-ahead" and distance_left >= 0 and distance_right >= 0 and moveInstruction == "stop":
-            print(":compare")
-            print(distance_forward)
-            if distance_forward > distance_left and distance_forward > distance_right:
+        #this part decides which direction to turn based on the distance values acquired. It runs on the same program scan that the right distance is received.
+        if topic == "robot/telemetry/distance-ahead" and distanceLeft > -1 and distanceRight > -1 and moveInstruction == "stop":
+            print("comparing")
+            #print(distanceForward)
+            if distanceForward > distanceLeft and distanceForward > distanceRight:
                 moveInstruction = "u-turn"
                 
             
-            elif distance_left > distance_right:
+            elif distanceLeft > distanceRight:
                 moveInstruction = "move left"
-            else: #if distance_left < distance_right:
+            else: #if distanceLeft < distanceRight:
                 moveInstruction = "move right"
         
         elif topic == "robot/telemetry/distance-ahead" and (moveInstruction == "move left" or moveInstruction == "move right" or moveInstruction == "u-turn" ):
             print("laststep")
-            if value >= 25:
+            if value >= 45:
                 moveInstruction = "move forward"
                 ultraInstruction = "read forward"
                 
             
         
         
-        if inAutoMode and topic != "robot/behaviour/drive" and topic != "robot/behaviour/ultrasonic-sensor":
+        if inAutoMode and topic != "robot/behaviour/drive" and topic != "robot/behaviour/ultrasonic-sensor": #any publication outide these 2 topics will cause the obstacle avoidance logic to execute and publish
             IoT_Controller.client.publish("robot/behaviour/drive", moveInstruction)
             IoT_Controller.client.publish("robot/behaviour/ultrasonic-sensor", ultraInstruction)
         
+        #we dont need the rules anymore since the decision making is hard-coded. Th rules system was limiting due to only one action per rule and needing to spam MQTT to transmit many variables.
         """for rule in IoT_Controller.rules: # the rules itself is a dictionary, where every rule has some values (in this case an array of conditions (each of which is its own dictionary of values) & a dictionary of action values)
             conditions = rule["conditions"] # array of condition dictionaries, each of which contains the values for the given condition
             conditions_met = True
