@@ -1,0 +1,68 @@
+[
+  {
+    "conditions": [
+      {
+        "topic": "robot/telemetry/distance-ahead",
+        "comparison": ">=",
+        "value": 25
+      },
+      {
+        "topic": "robot/behaviour/state",
+        "comparison": "==",
+        "value": "move forward"
+      }
+    ],
+    "action": {
+      "message": "Scanning forward while moving forward",
+      "topic": "robot/behaviour/state",
+      "value": "move forward"
+    }
+  },
+  {
+    "conditions": [
+      {
+        "topic": "robot/behaviour/state",
+        "comparison": "==",
+        "value": "move forward"
+      },
+      {
+        "topic": "robot/telemetry/distance-ahead",
+        "comparison": "<",
+        "value": 25
+      }
+    ],
+    "action": {
+      "message": "Stop and prepare",
+      "topic": "robot/behaviour/state",
+      "value": "stop"
+    }
+  },
+  {
+    "conditions": [
+      {
+        "topic": "robot/behaviour/state",
+        "comparison": "==",
+        "value": "stop"
+      }
+    ],
+    "action": {
+      "message": "Hot water tank temperature too low, turning on heater",
+      "topic": "house/hotwater/heater",
+      "value": "on"
+    }
+  },
+  {
+    "conditions": [
+      {
+        "topic": "house/hotwater/temp",
+        "comparison": ">=",
+        "value": 60
+      }
+    ],
+    "action": {
+      "message": "Hot water tank temperature sufficient, turning off heater",
+      "topic": "house/hotwater/heater",
+      "value": "off"
+    }
+  }
+]

@@ -7,14 +7,14 @@ import time
 from datetime import datetime
 
 # PID and heartbeat files for monitoring
-PID_FILE = "/tmp/historian.pid"
-HEARTBEAT_FILE = "/tmp/historian.heartbeat"
+PID_FILE = "/var/lib/iot_system/historian.pid"
+HEARTBEAT_FILE = "/var/lib/iot_system/historian.heartbeat"
 
 MQTT_BROKER = "localhost"
 MQTT_PORT = 1883
 MQTT_TOPIC = "#"
 MQTT_CLIENT_ID = "historian-client"
-DB_FILE = "historian_data.db"
+DB_FILE = "/var/lib/iot_system/historian_data.db"
 
 def save_pid():
     """Save process ID to file for monitoring"""

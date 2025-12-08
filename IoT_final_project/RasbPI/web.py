@@ -23,9 +23,9 @@ mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
 mqtt_client.loop_start()
 
 # Monitoring files
-CONTROLLER_PID = "/tmp/iot_controller.pid"
-CONTROLLER_HEARTBEAT = "/tmp/iot_controller.heartbeat"
-HISTORIAN_HEARTBEAT = "/tmp/historian.heartbeat"
+CONTROLLER_PID = "/var/lib/iot_system/controller.pid"
+CONTROLLER_HEARTBEAT = "/var/lib/iot_system/controller.heartbeat"
+HISTORIAN_HEARTBEAT = "/var/lib/iot_system/historian.heartbeat"
 
 def check_service_health(service_name, heartbeat_file):
     """Check if a service is healthy by reading heartbeat"""
@@ -136,13 +136,16 @@ def login():
             flash("Invalid username or password.", "danger")
     return render_template('login.html')
 
-@app.route('/manual')
+@app.route('/robotcontrol')
 def manual():
-    return render_template('manual.html')
+    return render_template('robotcontrol.html')
 
 @app.route('/publish/<msg>', methods=['POST'])
 def publish_message(msg):
-    mqtt_client.publish("robot/manual-movement", msg)
+    if msg == "begin obstacle avoidance": # alert both the Pi and the ESP that obstacle avoidance has begun so that they may reset 
+        mqtt_client.publish("robot/instruction-request", msg)
+    else:
+        mqtt_client.publish("robot/manual-movement", msg)
     return ("", 204)
 
 
