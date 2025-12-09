@@ -1,7 +1,7 @@
 // follow movement commands received from another device over UART, and when requested, turn the ultrasonic sensor to the desired angle and send back a distance reading over UART.
 
 #include <Servo.h>
-Servo servo; // create an object of the Servo class named "servo" (very original I know)
+Servo servo; // create an object of the Servo class named "servo" (very original name I know)
 
 //pin definitions
 #define echo 12
@@ -16,18 +16,26 @@ Servo servo; // create an object of the Servo class named "servo" (very original
 // constants
 const int motorSpeed = 128;
 
+const int forwardAngle = 80;  // 90 degrees is normally center, but servo is a bit off. Higher angles are left, lower angles are right.
+const int leftAngle = 125;
+const int rightAngle = 35;
+
 enum commands {
   STOP, FORWARD, BACKWARD, LEFT, RIGHT, READ_FORWARD, READ_LEFT, READ_RIGHT
 };
 
 //timestamp variables for timed actions
 long ultrasonicT = 0;
-long commandT = 0;
+long readT = 0; // time at which last serial read occured
 
 long servoReachAngleT = 0; // this timestamp is set in the future, the time at which the servo will have completed its swing. Based on the current angle, the target angle, and the approximate angular speed of the servo.
 
 // variable values
 byte distance = 0; // in cm.
+
+int targetAngle = 80;
+int previousTargetAngle = 80;
+bool distanceRequested = 0; // goes true when the arduino receives a request from the ESP for a distance reading. Goes false after the servo reaches its demanded angle and the ultrasonic sensor measures the distance ahead of it.
 
 
 
@@ -67,6 +75,32 @@ void move(int pwmBval, int pwmAval) { // control the robot's tank drive. Functio
   
 }
 
+void pointServoAndTimeSensor(long now, int cmd) { // aim the servo and set up the timing until the sensor should scan
+
+  if (cmd == READ_FORWARD) {
+    targetAngle = forwardAngle; distanceRequested = 1;
+    int angleDelta = targetAngle - previousTargetAngle;
+    angleDelta = abs(angleDelta);
+    servoReachAngleT = now + angleDelta * 7; // the math is such that an angle change of 90 degrees will create a delay of 630ms, which gives the servo more than enough time to turn
+    //servoReachAngleT = now + 500;
+  }
+  if (cmd == READ_LEFT) {
+    targetAngle = leftAngle; distanceRequested = 1;
+    int angleDelta = targetAngle - previousTargetAngle;
+    angleDelta = abs(angleDelta);
+    servoReachAngleT = now + angleDelta * 7; // the math is such that an angle change of 90 degrees will create a delay of 630ms, which gives the servo more than enough time to turn
+    //servoReachAngleT = now + 500;
+  }
+  if (cmd == READ_RIGHT) {
+    targetAngle = rightAngle; distanceRequested = 1;
+    int angleDelta = targetAngle - previousTargetAngle;
+    angleDelta = abs(angleDelta);
+    servoReachAngleT = now + angleDelta * 7; // the math is such that an angle change of 90 degrees will create a delay of 630ms, which gives the servo more than enough time to turn
+    //servoReachAngleT = now + 500;
+  }
+  
+}
+
 
 
 // body
@@ -83,29 +117,23 @@ void setup() {
 
   digitalWrite(stby, 1);
 
-  servo.write(80); // 90 degrees is normally center, but servo is a bit off. Higher angles are left, lower angles are right.
-  //servo.attach(10);
+  servo.write(targetAngle);
+  servo.attach(10);
 
+  delay(250); // wait a bit to ignore the gibberish that the ESP writes on to Serial when it first powers on.
 }
 
 
 
 void loop() {
-  long currentT = millis();
-
-  if ( (currentT - ultrasonicT) >= 25 ) { // use ultrasonic sensor 40 times /s. Above around 50/s causes the code to glitch out.
-    ultrasonicT = currentT;
-
-    distance = see(); // change this to only happen when read commands are received
-    Serial.write(distance);
-    //Serial.println(distance);
-  }
+  long currentT = millis(); // store the current time in this loop so that any small delay in between executing instructions is ignored when computing elapsed times & updating timestamps.
 
   if (Serial.available()) { // initiate robot actions based on which command was received through Serial
     byte command = Serial.read();
-    commandT = millis();
-    
-    switch (command) {
+    readT = millis();
+    //Serial.println(command);
+
+    switch (command) { // for movement
       case STOP:
         move(0, 0);
         break;
@@ -121,19 +149,27 @@ void loop() {
       case RIGHT:
         move(motorSpeed, -motorSpeed);
         break;
-      /*case READ_FORWARD: // wait before pinging the servo based on roughly how long it takes to get from the servo's current position to the desired one
-        a
-        break;
-      case READ_LEFT:
-        a
-        break;
-      case READ_RIGHT:
-        a
-        break;*/
+      
     }
+
+    pointServoAndTimeSensor(currentT, command); // for ultrasonic sensing
     
   }
-  else if (currentT - commandT > 100) {move(0, 0);} // during normal movement operation the ESP will constantly send movement instructions, so if none are received for too long then it means the Serial connection was interrupted (emergency stop the robot) or the arduino was already commanded to stop.
-  
-  
+  else if (currentT - readT > 500) { // during normal movement operation the ESP will frequently send movement instructions, so if none are received for too long then it means the Serial connection was interrupted (emergency stop the robot) or the arduino was already commanded to stop.
+    move(0, 0);
+  }
+
+  // if a distance value is requested and the current time has surpassed the time as which the servo is assumed to have completed its rotation, then get the distance value for Serial writing.
+  //Serial.println(currentT - servoReachAngleT);
+  //delay(10);
+  if (currentT > servoReachAngleT && distanceRequested) {
+  previousTargetAngle = targetAngle;
+  distanceRequested = 0;
+
+  distance = see();
+  Serial.write(distance);
+  }
+
+  servo.write(targetAngle);
+
 }
